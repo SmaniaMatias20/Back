@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const usuariosControllers = require('../controllers/usuariosControllers');
 
+// Ruta para iniciar sesion
+router.post("/iniciarSesion", usuariosControllers.iniciarSesion);
+
 // Ruta para crear un nuevo usuario
 router.post("/crearUsuario", usuariosControllers.crearUsuario);
 

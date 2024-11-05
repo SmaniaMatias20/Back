@@ -1,11 +1,43 @@
 const Usuario = require('../models/usuariosModels'); // Asegúrate de que esta ruta coincida con la ubicación de tu modelo
 
+
+// Iniciar sesión de un usuario
+async function iniciarSesion(req, res) {
+    try {
+        const { usuario, password } = req.body;
+
+        if (!usuario || !password) {
+            return res.status(400).json({ success: false, mensaje: 'Faltan datos requeridos' });
+        }
+
+        const usuarioExistente = await Usuario.findOne({ where: { usuario } });
+
+        if (!usuarioExistente) {
+            return res.status(404).json({ success: false, mensaje: 'Usuario no encontrado' });
+        }
+
+        // Asegúrate de usar un método seguro para comparar contraseñas
+        if (usuarioExistente.password !== password) {
+            return res.status(401).json({ success: false, mensaje: 'Contraseña incorrecta' });
+        }
+
+        res.status(200).json({
+            success: true,  // Agrega esta propiedad
+            mensaje: 'Inicio de sesión exitoso',
+            usuario: {
+                usuario: usuarioExistente.usuario,
+                rol: usuarioExistente.rol
+            }
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, mensaje: 'Error al iniciar sesión', error: error.message });
+    }
+}
+
+
 // Crear un nuevo usuario
 async function crearUsuario(req, res) {
     try {
-        // Imprimir el cuerpo de la solicitud para depuración
-        console.log(req.body);
-
         // Asegurarse de que todos los campos requeridos estén presentes
         const { usuario, rol, password } = req.body;
 
@@ -81,6 +113,7 @@ async function eliminarUsuario(req, res) {
 
 // Exporta las funciones en el formato solicitado
 module.exports = {
+    iniciarSesion,
     crearUsuario,
     obtenerUsuarios,
     obtenerUsuarioPorId,

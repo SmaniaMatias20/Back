@@ -1,4 +1,4 @@
-require('dotenv').config(); // Cargar variables de entorno desde .env
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const Routes = require('./src/routes/routes');
@@ -6,8 +6,18 @@ const sequelize = require('./src/config/dbConfig');
 
 // Inicializar Express
 const app = express();
+
+// Puerto donde se va a correr el server
+const PORT = process.env.PORT || 3000;
+
+// Middleware para habilitar CORS
 app.use(cors());
-const PORT = process.env.PORT || 3000; // Puedes usar el puerto 3000 o el que definas en tu entorno
+
+// Middleware para parsear JSON
+app.use(express.json());
+
+//Rutas
+app.use('/', Routes);
 
 // Probar la conexión
 const testConnection = async () => {
@@ -19,21 +29,10 @@ const testConnection = async () => {
     }
 };
 
-// Middleware para parsear JSON
-app.use(express.json());
-
-//Rutas
-app.use('/', Routes);
-
-// Ruta de ejemplo
-app.get('/', (req, res) => {
-    res.send('¡Hola mundo!');
-});
-
 // Sincronizar modelos con la base de datos
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ alter: true }); // Usa { force: true } si quieres eliminar y volver a crear las tablas
+        await sequelize.sync({ alter: true });
         console.log('Tablas sincronizadas con la base de datos.');
     } catch (error) {
         console.error('Error al sincronizar las tablas:', error);
